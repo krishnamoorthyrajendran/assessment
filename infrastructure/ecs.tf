@@ -115,40 +115,10 @@ resource "aws_ecs_task_definition" "app" {
         retries     = 3
         startPeriod = 60
       }
-      environment = [
-        {
-          name  = "RDS_DB_NAME"
-          value = var.db_name
-        },
-        {
-          name  = "RDS_USERNAME"
-          value = var.db_username
-        },
-        {
-          name  = "RDS_PASSWORD"
-          value = var.db_password
-        },
-        {
-          name  = "RDS_HOSTNAME"
-          value = aws_db_instance.postgres.address
-        },
-        {
-          name  = "RDS_PORT"
-          value = "5432"
-        },
-        {
-          name  = "S3_BUCKET_NAME"
-          value = aws_s3_bucket.app_storage.bucket
-        },
-        {
-          name  = "S3_REGION_NAME"
-          value = var.aws_region
-        },
-        {
-          name  = "LB_ENDPOINT"
-          value = aws_lb.main.dns_name
-        }
-      ]
+      environmentFiles = [{
+  type  = "s3",
+  value = "arn:aws:s3:::${aws_s3_bucket.app_storage.bucket}/${var.env_s3_key}"
+}]
 
       logConfiguration = {
         logDriver = "awslogs"

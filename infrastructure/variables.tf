@@ -40,7 +40,7 @@ variable "db_password" {
   description = "Database password"
   type        = string
   default     = "krihsnamoorthy123"
-  # sensitive   = true
+  sensitive   = true
 }
 
 variable "ecs_task_cpu" {
