@@ -15,15 +15,6 @@ output "load_balancer_url" {
   value       = "http://${aws_lb.main.dns_name}"
 }
 
-output "ecr_repository_rails_url" {
-  description = "ECR repository URL for Rails app"
-  value       = aws_ecr_repository.rails_app.repository_url
-}
-
-output "ecr_repository_nginx_url" {
-  description = "ECR repository URL for Nginx"
-  value       = aws_ecr_repository.nginx.repository_url
-}
 
 output "rds_endpoint" {
   description = "RDS instance endpoint"
@@ -53,4 +44,10 @@ output "private_subnet_ids" {
 output "public_subnet_ids" {
   description = "Public subnet IDs"
   value       = aws_subnet.public[*].id
+}
+
+
+output "env_file_s3_path" {
+  description = "S3 path to the environment file"
+  value       = "arn:aws:s3:::${aws_s3_bucket.app_storage.bucket}/${var.env_s3_key}"
 }

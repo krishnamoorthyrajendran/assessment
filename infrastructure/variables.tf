@@ -61,3 +61,8 @@ variable "ecs_service_desired_count" {
   default     = 2
 }
 
+variable "env_s3_key" {
+  description = "Key name for the environment file in S3"
+  type        = string
+  default     = "rails_app.env"
+}

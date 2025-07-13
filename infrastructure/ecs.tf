@@ -116,9 +116,9 @@ resource "aws_ecs_task_definition" "app" {
         startPeriod = 60
       }
       environmentFiles = [{
-  type  = "s3",
-  value = "arn:aws:s3:::${aws_s3_bucket.app_storage.bucket}/${var.env_s3_key}"
-}]
+        type  = "s3",
+        value = "arn:aws:s3:::${aws_s3_bucket.app_storage.bucket}/rails_app.env"
+      }]
 
       logConfiguration = {
         logDriver = "awslogs"
@@ -133,7 +133,8 @@ resource "aws_ecs_task_definition" "app" {
     },
     {
       name  = "nginx"
-      image = "413745378153.dkr.ecr.ap-south-1.amazonaws.com/rails-app-nginx:v2"
+      image = "413745378153.dkr.ecr.ap-south-1.amazonaws.com/rails-app-nginx:latest"
+      
 
       portMappings = [
         {
@@ -148,7 +149,7 @@ resource "aws_ecs_task_definition" "app" {
           condition     = "START"
         }
       ]
-      
+
 
       logConfiguration = {
         logDriver = "awslogs"
@@ -190,7 +191,8 @@ resource "aws_ecs_service" "app" {
 
   depends_on = [
     aws_lb_listener.app,
-    aws_iam_role_policy_attachment.ecs_task_execution_role
+    aws_iam_role_policy_attachment.ecs_task_execution_role,
+    aws_s3_object.env_file
   ]
 
   tags = {
@@ -228,4 +230,31 @@ resource "aws_security_group" "ecs" {
   tags = {
     Name = "${var.project_name}-ecs-sg"
   }
+}
+
+
+resource "aws_iam_role_policy" "ecs_execution_s3_env" {
+  name = "${var.project_name}-ecs-execution-s3-env-policy"
+  role = aws_iam_role.ecs_task_execution_role.name
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "s3:GetObject",
+          "s3:GetObjectVersion"
+        ],
+        Resource = [
+          "${aws_s3_bucket.app_storage.arn}/rails_app.env"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_execution_s3_readonly" {
+  role       = aws_iam_role.ecs_task_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
 }
