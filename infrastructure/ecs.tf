@@ -133,7 +133,7 @@ resource "aws_ecs_task_definition" "app" {
     },
     {
       name  = "nginx"
-      image = "413745378153.dkr.ecr.ap-south-1.amazonaws.com/rails-app-nginx:latest"
+      image = "413745378153.dkr.ecr.ap-south-1.amazonaws.com/rails-app-nginx:v2"
       
 
       portMappings = [
